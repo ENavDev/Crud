@@ -1,6 +1,6 @@
 const  express = require('express');
 const app = express();
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const cors = require('cors');
 
 
@@ -22,40 +22,71 @@ const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '12345',
-    database: 'Usuario',
+    database: 'usuario',
+    // port: '3306'
 
 });
 
-
+//crear
 app.post("/create",(req, res)=>{
-    const Identificacion = req.body.identificacion;
-    const Tipo_identificacion = req.body.Tipo_identificacion;
-    const P_nombre = req.body.P_nombre;
-    const S_nombre = req.body.S_nombre;
-    const P_apellido = req.body.P_apellido;
-    const S_apellido = req.body.S_apellido;
+    const Identificacion = req.body.Identificacion;
+    const Tipo_Identificacion = req.body.Tipo_identificacion;
+    const P_Nombre = req.body.P_nombre;
+    const S_Nombre = req.body.S_nombre;
+    const P_Apellido = req.body.P_apellido;
+    const S_Apellido = req.body.S_apellido;
     const Email = req.body.Email;
     const Telefono = req.body.Telefono;
     const Direccion = req.body.Direccion;
     const Ocupacion = req.body.Ocupacion;
-    const fecha_nacimiento = req.body.fecha_nacimiento;
-    const foto = req.body.foto;
+    const Fecha_Nacimiento = req.body.Fecha_Nacimiento;
+    const Foto = req.body.Foto;
 
     db.query('INSERT INTO Informacion_personal (Identificacion, Tipo_identificacion, P_nombre, S_nombre, P_apellido, S_apellido, Direccion, Email, Telefono, Ocupacion, F_nacimiento, Foto) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-    [Identificacion, Tipo_identificacion, P_nombre, S_nombre, P_apellido, S_apellido, Direccion, Email, Telefono, Ocupacion, fecha_nacimiento, foto],
-    
-    (err,result)=>{
-        if(err){
-            console.log('error al insertar en la bd',err);
-            return res.status(500).send('error del servidor');
-
-        }else{
-            res.send('Usuario registrado exitosamente');
-            res.status(200).send('ok');
+    [Identificacion, Tipo_Identificacion, P_Nombre, S_Nombre, P_Apellido, S_Apellido, Direccion, Email, Telefono, Ocupacion, Fecha_Nacimiento, Foto], (err, result) => {
+        if (err) {
+            console.log('error al insertar en la bd', err);
+            return res.status(500).send('Error del servidor');
+        } else {
+            console.log(result);
+            res.status(200).send('Usuario registrado exitosamente');
         }
-    }
-    )
+    });
 });
+
+
+//listar
+
+app.get("/Usuarios", (req, res) => {
+     db.query('SELECT * FROM informacion_personal', (err, result) => {
+      if (err) {
+        console.log(err);
+        res.status(500).send({ error: 'Error al obtener los usuarios' });
+      } else {
+        res.send(result);
+      }
+    });
+  });
+  
+
+
+// Listar por id
+// app.get("/Usuarios_id", (req, res) => {
+//   db.query('SELECT * FROM Informacion_Personal WHERE cedula = ?', (err, result) => {
+//       if (err) {
+//           console.log(err);
+//       } else {
+//           res.send(result);
+//       }
+//   });
+// });
+
+
+
+
+
+
+
 
 
 app.listen(3001, ()=>{
