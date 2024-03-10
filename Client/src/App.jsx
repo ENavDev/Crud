@@ -5,6 +5,9 @@ import Axios from "axios";
 
 function App() {
 
+  const [showUsers, setShowUsers] = useState(false);
+
+
   const [formData, setFormData] = useState({
     Identificacion: '',
     Tipo_Identificacion: '',
@@ -96,11 +99,16 @@ function App() {
         console.error("Error al obtener los usuarios:", error);
       });
   }
-  
-  useEffect(() => {
-    GetUsuarios();
-  }, [UsersList]);
 
+  useEffect(() => {
+    if (showUsers) { // Solo obtiene los usuarios si showUsers es true
+      GetUsuarios();
+    }
+  }, [showUsers]);
+
+  const handleShowUsers = () => {
+    setShowUsers(true); // Cambia el estado para mostrar la lista de usuarios
+  }
  
 
 
@@ -239,24 +247,46 @@ function App() {
 
 
     
-       <div>
+       <div className='list'>
         <button onClick={GetUsuarios}>Listar Usuarios</button>
-        <div>
-        {UsersList.map((user, index) => (
-  <div key={index}>
-    <p>Identificacion: {user.Identificacion}</p>
-    <p>Tipo de Identificacion: {user.Tipo_identificacion}</p>
-    <p>Primer Nombre: {user.P_nombre}</p>
-    {/* Agrega el resto de las propiedades del usuario aquí */}
-  </div>
-))}
+        
+        {UsersList.length > 0 && (
+  <table>
+    <thead>
+      <tr>
+        <th>Identificación</th>
+        <th>Tipo de Identificación</th>
+        <th>Primer Nombre</th>
+        <th>Primer Apellido</th>
+        <th>Email</th>
+        <th>Telefono</th>
+        <th>fecha de nacimiento</th>
+        <th>Ocupacion</th>
+        {/* Agrega el resto de las propiedades del usuario aquí */}
+      </tr>
+    </thead>
+    <tbody>
+      {UsersList.map((user, index) => (
+        <tr key={index}>
+          <td>{user.Identificacion}</td>
+          <td>{user.Tipo_identificacion}</td>
+          <td>{user.P_nombre}</td>
+          <td>{user.P_Apellido}</td>
+          <td>{user.Email} </td>
+          <td>{user.Telefono}</td>
+          <td>{user.Fecha_Nacimiento}</td>
+          <td>{user.Ocupacion}</td>
+          
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}
 
-          </div>
-        </div>
 
 
 
-
+      </div>
       </form>
     </div>
   );
