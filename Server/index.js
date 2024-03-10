@@ -70,16 +70,6 @@ app.get("/Usuarios", (req, res) => {
   
 
 
-// Listar por id
-// app.get("/Usuarios_id", (req, res) => {
-//   db.query('SELECT * FROM Informacion_Personal WHERE cedula = ?', (err, result) => {
-//       if (err) {
-//           console.log(err);
-//       } else {
-//           res.send(result);
-//       }
-//   });
-// });
 
 
 

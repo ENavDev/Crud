@@ -1,13 +1,10 @@
-import { useState, useEffect } from 'react'
-import './App.css'
-import Axios from "axios";
-
+import React, { useState } from 'react';
+import './App.css';
+import Axios from 'axios';
+import Listar from './Components/Listar';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 function App() {
-
-  const [showUsers, setShowUsers] = useState(false);
-
-
   const [formData, setFormData] = useState({
     Identificacion: '',
     Tipo_Identificacion: '',
@@ -23,99 +20,60 @@ function App() {
     Foto: ''
   });
 
+  const [mostrarListar, setMostrarListar] = useState(false);
 
+  const handleListarClick = () => {
+    setMostrarListar(!mostrarListar);
+  };
 
-  //validadciones de edad y tipo de documento
-    const handleChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
+  
     let updatedValue = value;
-
+  
+    // Validar la fecha de nacimiento y determinar el tipo de identificación
     if (name === 'Fecha_Nacimiento') {
       const birthDate = new Date(value);
       const today = new Date();
       const age = today.getFullYear() - birthDate.getFullYear();
-
+  
       if (age < 7) {
-        setFormData(prevState => ({
-          ...prevState, 'Tipo_Identificacion': 'R.C'
-        }));
-        alert('eres menor de 7');
+        updatedValue = 'R.C';
       } else if (age >= 7 && age < 18) {
-        setFormData(prevState => ({
-          ...prevState, 'Tipo_Identificacion': 'T.I'
-        }));
-        alert('eres menor de edad');
+        updatedValue = 'T.I';
       } else if (age >= 18) {
-        setFormData(prevState => ({
-          ...prevState, 'Tipo_Identificacion': 'C.C'
-        }));
-        alert('eres mayor');
+        updatedValue = 'C.C';
       }
     }
+  
+    // Actualizar el estado con el valor actualizado
     setFormData(prevState => ({
       ...prevState,
-      [name]: value
+      [name]: updatedValue
     }));
   };
-
-
+  
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(formData);
   };
 
-
-  const [UsersList, setUsers] = useState([]);
-
   const ADD = () => {
-    Axios.post("http://localhost:3001/create", {
-      Identificacion: formData.Identificacion,
-      Tipo_identificacion: formData.Tipo_Identificacion,
-      P_nombre: formData.P_Nombre,
-      S_nombre: formData.S_Nombre,
-      P_apellido: formData.P_Apellido,
-      S_apellido: formData.S_Apellido,
-      Email: formData.Email,
-      Telefono: formData.Telefono,
-      Direccion: formData.Direccion,
-      Ocupacion: formData.Ocupacion,
-      Fecha_Nacimiento: formData.Fecha_Nacimiento,
-      Foto: formData.Foto,
-    }).then(() => {
-      alert('Registrado con exito');
-
-    })
-  }
-
-  
-
-  const  GetUsuarios = () => {
-    Axios.get("http://localhost:3001/Usuarios")
-      .then((response) => {
-        setUsers(response.data);
+    Axios.post("http://localhost:3001/create", formData)
+      .then(() => {
+        alert('Registrado con éxito');
       })
-      .catch((error) => {
-        console.error("Error al obtener los usuarios:", error);
+      .catch(error => {
+        console.error('Error al registrar:', error);
       });
-  }
-
-  useEffect(() => {
-    if (showUsers) { // Solo obtiene los usuarios si showUsers es true
-      GetUsuarios();
-    }
-  }, [showUsers]);
-
-  const handleShowUsers = () => {
-    setShowUsers(true); // Cambia el estado para mostrar la lista de usuarios
-  }
- 
-
-
+  };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit} className="form-container">
+    <Router>
+      <div onSubmit={handleSubmit}>
+
         <label htmlFor="identificacion">Identificacion:</label>
         <input
           type="number"
@@ -242,54 +200,25 @@ function App() {
           className="form-input"
         />
         <button onClick={ADD}>Registrar</button>
- 
-
-
-
-    
-       <div className='list'>
-        <button onClick={GetUsuarios}>Listar Usuarios</button>
-        
-        {UsersList.length > 0 && (
-  <table>
-    <thead>
-      <tr>
-        <th>Identificación</th>
-        <th>Tipo de Identificación</th>
-        <th>Primer Nombre</th>
-        <th>Primer Apellido</th>
-        <th>Email</th>
-        <th>Telefono</th>
-        <th>fecha de nacimiento</th>
-        <th>Ocupacion</th>
-        {/* Agrega el resto de las propiedades del usuario aquí */}
-      </tr>
-    </thead>
-    <tbody>
-      {UsersList.map((user, index) => (
-        <tr key={index}>
-          <td>{user.Identificacion}</td>
-          <td>{user.Tipo_identificacion}</td>
-          <td>{user.P_nombre}</td>
-          <td>{user.P_Apellido}</td>
-          <td>{user.Email} </td>
-          <td>{user.Telefono}</td>
-          <td>{user.Fecha_Nacimiento}</td>
-          <td>{user.Ocupacion}</td>
-          
-        </tr>
-      ))}
-    </tbody>
-  </table>
-)}
-
-
 
 
       </div>
-      </form>
-    </div>
-  );
-}
 
-export default App
+      <div>
+        <Link to="/listar"></Link>
+        <button onClick={handleListarClick}>Mostrar/Ocultar Listar</button>
+      </div>
+
+
+      <Routes>
+        <Route path="/listar" element={<Listar />} />
+      </Routes>
+
+
+      {mostrarListar && <Listar />}
+
+    </Router>
+
+  )
+}
+export default App;
